@@ -6,6 +6,10 @@
   "scripts": {
     "test": "mocha"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josp70/user-auth-jsonrpc"
+  },
   "keywords": [
     "user",
     "authentication",
