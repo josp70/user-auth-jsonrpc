@@ -1,0 +1,21 @@
+{
+  "name": "user-auth-jsonrpc",
+  "version": "0.0.0",
+  "description": "package to support in the implementation of an user authentication end-point.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "user",
+    "authentication",
+    "express",
+    "jsonrpc",
+    "JSON-RPC",
+    "mongodb",
+    "jwks",
+    "jwt"
+  ],
+  "author": "Jorge Suit <josp.jorge@gmail.com>",
+  "license": "MIT"
+}
