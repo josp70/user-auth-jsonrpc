@@ -52,3 +52,5 @@ exports.mount = function(router, options) {
 	.then(configMail)
 	.then(configJWKS);
 };
+
+exports.errors = require('./errors/rpc-errors');
