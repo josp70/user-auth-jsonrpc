@@ -67,7 +67,7 @@ start();
 
 # Tests
 
-TBD
+`npm test`
 
 # Email Configuration
 

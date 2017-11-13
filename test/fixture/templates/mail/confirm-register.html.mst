@@ -1,0 +1,3 @@
+<p>Hi {{userName}},</p>
+<p>Thanks for signing up for service_name!</p>
+<p>Please confirm your account at <a class=activate href="{{href}}">activate</a></p>

@@ -21,5 +21,18 @@
     "jwt"
   ],
   "author": "Jorge Suit <josp.jorge@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "basic-auth": "^2.0.0",
+    "bcrypt": "^1.0.3",
+    "express-bearer-token": "^2.1.0",
+    "jsonrpc2-express": "^0.3.2",
+    "jwks-db": "0.0.1",
+    "mailer-template": "0.0.1"
+  },
+  "devDependencies": {
+    "chakram": "^1.5.0",
+    "cheerio": "^1.0.0-rc.2",
+    "mongodb-connection-cache": "0.0.1"
+  }
 }
