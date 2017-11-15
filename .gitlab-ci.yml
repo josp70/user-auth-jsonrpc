@@ -8,6 +8,9 @@ image: node:latest
 services:
   - mongo:latest
 
+variables:
+  MONGO_URI: 'mongodb://mongo/user_auth'
+
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
