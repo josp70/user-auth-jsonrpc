@@ -5,51 +5,60 @@ const userAuth = require('../../index');
 
 const app = express();
 
-let routerRpc = express.Router();
+const routerRpc = new express.Router();
 
 app.use('/', routerRpc);
 
 function mountAuth() {
-    return userAuth.mount(routerRpc, {
-	path: '/auth',
-	db: db.get(),
-	mail: {
-            sender: 'test-sender@gmail.com',
-            dirTemplates: path.join(__dirname, 'templates/mail'),
-            templates: ['confirm-register', 'confirm-password']
-        }
-    });
+  return userAuth.mount(routerRpc, {
+    db: db.get(),
+    mail: {
+      dirTemplates: path.join(__dirname, 'templates/mail'),
+      sender: 'test-sender@gmail.com',
+      templates: [
+        'confirm-register',
+        'confirm-password'
+      ]
+    },
+    path: '/auth'
+  });
 }
 
-let server;
+let server = {};
+
 function startServer() {
-    server = app.listen(0, () => {
-	console.log('Server listening on port ' + server.address().port);
-	app.emit('ready', null);
-    });
-    exports.server = server;
-};
+  const port = 0;
+
+  server = app.listen(port, () => {
+    console.log(`Server listening on port ${server.address().port}`);
+    app.emit('ready', null);
+  });
+  exports.server = server;
+}
 
 function start() {
-    db.connect('mongodb://localhost:27017/user_auth')
-	.then(mountAuth)
-	.then(startServer);
-};
+  db.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/user_auth')
+    .then(mountAuth)
+    .then(startServer);
+}
 
 function close() {
-    db.get().close().then(()=>{
-	console.log('db closed');
-	server.close();
-    }).catch(err=>{
-	console.log("failed closing db");
-	console.log(err);
+  db.get().close()
+    .then(() => {
+      console.log('db closed');
+      server.close();
+    })
+    .catch((err) => {
+      console.log('failed closing db');
+      console.log(err);
     });
 }
 
-if(process.env.NODE_ENV !== 'test') {
-    start();
+/* eslint no-process-env: "off" */
+if (process.env.NODE_ENV === 'test') {
+  exports.start = start;
+  exports.close = close;
+  exports.app = app;
 } else {
-    exports.start = start;
-    exports.close = close;
-    exports.app = app;
+  start();
 }
