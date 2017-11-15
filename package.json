@@ -4,11 +4,12 @@
   "description": "package to support in the implementation of an user authentication end-point.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint errors http jsonrpc model test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/josp70/user-auth-jsonrpc"
+    "url": "git+https://gitlab.com/jorge.suit/user-auth-jsonrpc.git"
   },
   "keywords": [
     "user",
@@ -33,6 +34,8 @@
   "devDependencies": {
     "chakram": "^1.5.0",
     "cheerio": "^1.0.0-rc.2",
+    "eslint": "^4.11.0",
+    "mocha": "^4.0.1",
     "mongodb-connection-cache": "0.0.1"
   }
 }
