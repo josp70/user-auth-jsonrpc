@@ -1,6 +1,6 @@
 {
   "name": "user-auth-jsonrpc",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "package to support in the implementation of an user authentication end-point.",
   "main": "index.js",
   "scripts": {
