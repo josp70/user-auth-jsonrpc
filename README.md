@@ -1,5 +1,6 @@
 user-auth-jsonrpc
 =========
+![build status](https://gitlab.com/jorge.suit/user-auth-jsonrpc/badges/master/build.svg)
 
 This is a node package to support in the implementation of an user
 authentication end-point.
