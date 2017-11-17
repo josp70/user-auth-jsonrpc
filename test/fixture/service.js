@@ -39,7 +39,10 @@ function startServer() {
 function start() {
   db.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/user_auth')
     .then(mountAuth)
-    .then(startServer);
+    .then(startServer)
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 function close() {
@@ -48,9 +51,9 @@ function close() {
       console.log('db closed');
       server.close();
     })
-    .catch((err) => {
+    .catch((error) => {
       console.log('failed closing db');
-      console.log(err);
+      throw error;
     });
 }
 

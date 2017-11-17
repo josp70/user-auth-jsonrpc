@@ -6,6 +6,8 @@
 // During the test the env variable is set to test
 
 process.env.NODE_ENV = 'test';
+process.env.ADMIN_USER = 'admin-test@gmail.com';
+process.env.ADMIN_PASSWORD = 'admin';
 const cheerio = require('cheerio');
 const chakram = require('chakram');
 const {expect} = chakram;
@@ -24,7 +26,7 @@ function buildRequest(method, params) {
   return jsonrpcLite.request(id, method, params);
 }
 
-describe('MSVC-USER', () => {
+describe('USER-AUTH-JSONRPC', () => {
   const dataTester = {};
 
   let port = 0,
@@ -32,18 +34,14 @@ describe('MSVC-USER', () => {
       schemaSuccess = {},
       schemaError = {};
   const userNormal = 'user-test@gmail.com';
-  const userAdmin = 'admin-test@gmail.com';
-  const passTest = 'password';
+  const userAdmin = process.env.ADMIN_USER;
+  const passTest = process.env.ADMIN_PASSWORD;
   const profileNormal = {
     name: 'Paco',
     surname: 'Perico',
     company: 'Sus labores'
   };
-  const profileAdmin = {
-    name: 'Pepito',
-    surname: 'Grillo',
-    company: 'Sus labores'
-  };
+
   const Kb = 1024;
   const permissionTest = {
     gidml: {
@@ -123,6 +121,14 @@ describe('MSVC-USER', () => {
         } else {
           console.log(`not removed test user ${userNormal}`);
         }
+        users.login(userAdmin, passTest)
+          .then((logged) => {
+            console.log(logged.token);
+            dataTester.tokenAdmin = logged.token;
+            done();
+          });
+
+        /*
         users.register(userAdmin, passTest, profileAdmin, true)
           .then((resultAdmin) => {
             console.log('created admin user');
@@ -144,7 +150,7 @@ describe('MSVC-USER', () => {
                   dataTester.tokenAdmin = logged.token;
                   done();
                 });
-            });
+            }); */
       });
     });
   });
@@ -153,7 +159,7 @@ describe('MSVC-USER', () => {
     it('it return 200 & missing parameter when email is undefined', () => {
       const jsonReq = buildRequest('register', {
         password: passTest,
-        profile: profileAdmin
+        profile: profileNormal
       });
       const options = {
         'headers': {'Content-Type': 'application/json'}
@@ -175,7 +181,7 @@ describe('MSVC-USER', () => {
     it('it return 200 & missing parameter when password is undefined', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        profile: profileAdmin
+        profile: profileNormal
       });
       const options = {
         'headers': {'Content-Type': 'application/json'}
@@ -557,6 +563,34 @@ describe('MSVC-USER', () => {
       return chakram.wait();
     });
 
+    /*
+    it('it return 200 & error when and invalid token is provided', () => {
+      const jsonReq = buildRequest('updateProfile', {
+        email: userNormal,
+        profile: profileNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}xx`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expect(response).to.comprise
+        .json(jsonrpcLite.error(jsonReq.id,
+                                rpcErrors.unauthorized({
+                                  email: jsonReq.params.email,
+                                  sub: userNormal
+                                })));
+      after(() => {
+        console.log(response.valueOf().body);
+      });
+      return chakram.wait();
+    }); */
+
     it('it return 200 & error when admin user try to modify account not found', () => {
       const jsonReq = buildRequest('updateProfile', {
         email: 'user-not-found@gmail.com',
@@ -752,6 +786,30 @@ describe('MSVC-USER', () => {
       const jsonReq = buildRequest('updatePermission', {
         email: userNormal,
         permission: permissionTest
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.comprise
+        .json(jsonrpcLite.success(jsonReq.id,
+                                  {email: userNormal}));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+  });
+
+  describe('/auth makeAdmin', () => {
+    it('it return 200 & success when admin user try to modify a valid account', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal,
+        admin: true
       });
       const options = {
         'headers': {

@@ -143,3 +143,25 @@ jsonrpc.updatePermission = (req) => {
       return users.updatePermission(email, permission);
     });
 };
+
+jsonrpc.setAdmin = (req) => {
+  const email = getParameter(req, 'email');
+  const admin = getParameter(req, 'admin');
+
+  if (typeof admin === 'boolean') {
+    return extractJWT(req.token)
+      .then((decoded) => {
+        if (!decoded.payload.admin) {
+          return Promise.reject(rpcErrors.unauthorized({
+            reason: 'only admin users are allowed to modify admin status',
+            sub: decoded.payload.sub
+          }));
+        }
+        return users.setAdmin(email, admin);
+      });
+  }
+  return Promise.reject(jsonrpcLite.JsonRpcError.invalidParams({
+    message: 'invalid admin paramemeter, must be Boolean',
+    parameter: admin
+  }));
+};
