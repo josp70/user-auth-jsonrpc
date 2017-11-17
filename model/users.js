@@ -19,9 +19,63 @@ exports.find = (email) => db.collection('users').findOne({email});
 exports.remove = (email) =>
   db.collection('users').deleteOne({email});
 
+const saltRounds = 5;
+
+function insertUser(info) {
+  const {email, password, profile, token, admin = false} = info;
+
+  return bcrypt.hash(password, saltRounds)
+    .then((hash) =>
+          db.collection('users').insertOne({
+            admin,
+            dateCreate: new Date(),
+            datePassword: null,
+            dateRegister: null,
+            email,
+            hash,
+            hashPassword: null,
+            permission: {},
+            profile,
+            tokenPassword: null,
+            tokenRegister: token
+          })
+          .then((result) => {
+            if (result.insertedCount > 0) {
+              return Promise.resolve({
+                email,
+                profile,
+                token
+              });
+            }
+            return Promise.reject(rpcErrors.dbFailInsert({
+              doc: {email},
+              reason: 'failed insertOne'
+            }));
+          }));
+}
+
+exports.createAdminAccount = (email, password) =>
+  userExists(email)
+  .then((check) => {
+    if (check) {
+      console.log('admin user already created', email);
+      return {
+        email,
+        profile: {},
+        token: null
+      };
+    }
+    return insertUser({
+      admin: true,
+      email,
+      password,
+      profile: {},
+      token: null
+    });
+  });
+
 exports.register = (email, password, profile, admin = false) => {
   const token = uuidv4();
-  const saltRounds = 5;
 
   return userExists(email).then((check) => {
     if (check) {
@@ -30,36 +84,35 @@ exports.register = (email, password, profile, admin = false) => {
         reason: 'user already registered'
       }));
     }
-    return bcrypt.hash(password, saltRounds)
-      .then((hash) =>
-            db.collection('users').insertOne({
-              admin,
-              dateCreate: new Date(),
-              datePassword: null,
-              dateRegister: null,
-              email,
-              hash,
-              hashPassword: null,
-              permission: {},
-              profile,
-              tokenPassword: null,
-              tokenRegister: token
-            })
-            .then((result) => {
-              if (result.insertedCount > 0) {
-                return Promise.resolve({
-                  email,
-                  profile,
-                  token
-                });
-              }
-              return Promise.reject(rpcErrors.dbFailInsert({
-                doc: {email},
-                reason: 'failed insertOne'
-              }));
-            }));
+    return insertUser({
+      admin,
+      email,
+      password,
+      profile,
+      token
+    });
   });
 };
+
+exports.setAdmin = (email, admin) =>
+  db.collection('users')
+  .findOneAndUpdate({email}, {'$set': {admin}}, {
+    projection: {
+      _id: 0,
+      admin: 1,
+      email: 1
+    },
+    returnOriginal: false
+  })
+  .then((result) => {
+    if (result.lastErrorObject.updatedExisting) {
+      return Promise.resolve(result.value);
+    }
+    return Promise.reject(rpcErrors.entityNotFound({
+      email,
+      reason: `user ${email} does not exists`
+    }));
+  });
 
 exports.confirmRegister = (email, token) => {
   const dte = new Date();

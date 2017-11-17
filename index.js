@@ -46,9 +46,24 @@ function configRouter(router, options) {
   return Promise.resolve(options);
 }
 
+function configAdmin(options) {
+  if (process.env.ADMIN_USER) {
+    if(process.env.ADMIN_USER === '' ||
+       (process.env.ADMIN_PASSWORD === undefined ||
+        process.env.ADMIN_PASSWORD === '')) {
+      return Promise.reject(new Error('Ivalid ADMIN_USER/ADMIN_PASSWORD'));
+    }
+    return users.createAdminAccount(process.env.ADMIN_USER,
+                                  process.env.ADMIN_PASSWORD)
+      .then(() => options);
+  }
+  return Promise.resolve(options);
+}
+
 exports.mount = (router, options) => configRouter(router, options)
   .then(configDb)
   .then(configMail)
-  .then(configJWKS);
+  .then(configJWKS)
+  .then(configAdmin);
 
 exports.errors = require('./errors/rpc-errors');
