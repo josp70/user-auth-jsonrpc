@@ -147,6 +147,20 @@ exports.confirmRegister = (email, token) => {
     });
 };
 
+function findUser(email, options) {
+    return db.collection('users')
+    .findOne({email}, options)
+    .then((doc) => {
+      if (doc === null) {
+        return Promise.reject(rpcErrors.entityNotFound({
+          email,
+          reason: 'user not found'
+        }));
+      }
+      return doc;
+    });
+}
+
 exports.login = (email, password) => db.collection('users')
   .findOne({email}, {
     fields: {
@@ -197,26 +211,35 @@ exports.login = (email, password) => db.collection('users')
       });
   });
 
+exports.readProfile = (email) =>
+  findUser(email, {
+    fields: {
+      _id: 0,
+      email: 1,
+      profile: 1
+    }
+  });
+
 exports.updateProfile = (email, profile) =>
-  db.collection('users')
-    .findOneAndUpdate({email}, {
-      '$set': {profile}
-    }, {
-      projection: {
-        _id: 0,
-        email: 1
-      },
-      returnOriginal: false
-    })
-    .then((result) => {
-      if (result.lastErrorObject.updatedExisting) {
-        return Promise.resolve(result.value);
-      }
-      return Promise.reject(rpcErrors.entityNotFound({
-        email,
-        reason: 'user not found'
-      }));
-    });
+           db.collection('users')
+  .findOneAndUpdate({email}, {
+    '$set': {profile}
+  }, {
+    projection: {
+      _id: 0,
+      email: 1
+    },
+    returnOriginal: false
+  })
+  .then((result) => {
+    if (result.lastErrorObject.updatedExisting) {
+      return Promise.resolve(result.value);
+    }
+    return Promise.reject(rpcErrors.entityNotFound({
+      email,
+      reason: 'user not found'
+    }));
+  });
 
 exports.updatePermission = (email, permission) =>
   db.collection('users')
@@ -234,7 +257,7 @@ exports.updatePermission = (email, permission) =>
       return Promise.resolve(result.value);
     }
     return Promise.reject(rpcErrors.entityNotFound({
-        email,
+      email,
       reason: 'user not found'
     }));
   });
