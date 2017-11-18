@@ -111,6 +111,22 @@ function extractJWT(token) {
     });
 }
 
+jsonrpc.readProfile = (req) => {
+  const email = getParameter(req, 'email');
+
+  return extractJWT(req.token)
+    .then((decoded) => {
+      if (decoded.payload.sub !== email && !decoded.payload.admin) {
+        return Promise.reject(rpcErrors.unauthorized({
+          email,
+          reason: 'not allowed to read user profile',
+          sub: decoded.payload.sub
+        }));
+      }
+      return users.readProfile(email);
+    });
+};
+
 jsonrpc.updateProfile = (req) => {
   const email = getParameter(req, 'email');
   const profile = getParameter(req, 'profile');

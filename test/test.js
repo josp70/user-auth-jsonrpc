@@ -26,6 +26,14 @@ function buildRequest(method, params) {
   return jsonrpcLite.request(id, method, params);
 }
 
+function expectInvalidParam(id, response, name) {
+  expect(response)
+    .to.comprise
+    .json(jsonrpcLite.error(id,
+                            jsonrpcLite
+                            .JsonRpcError.invalidParams({parameter: name})));
+}
+
 describe('USER-AUTH-JSONRPC', () => {
   const dataTester = {};
 
@@ -35,7 +43,8 @@ describe('USER-AUTH-JSONRPC', () => {
       schemaError = {};
   const userNormal = 'user-test@gmail.com';
   const userAdmin = process.env.ADMIN_USER;
-  const passTest = process.env.ADMIN_PASSWORD;
+  const passNormal = 'password';
+  const passAdmin = process.env.ADMIN_PASSWORD;
   const profileNormal = {
     name: 'Paco',
     surname: 'Perico',
@@ -121,36 +130,12 @@ describe('USER-AUTH-JSONRPC', () => {
         } else {
           console.log(`not removed test user ${userNormal}`);
         }
-        users.login(userAdmin, passTest)
+        users.login(userAdmin, passAdmin)
           .then((logged) => {
             console.log(logged.token);
             dataTester.tokenAdmin = logged.token;
             done();
           });
-
-        /*
-        users.register(userAdmin, passTest, profileAdmin, true)
-          .then((resultAdmin) => {
-            console.log('created admin user');
-            console.log(resultAdmin);
-            return users.confirmRegister(resultAdmin.email, resultAdmin.token);
-          })
-          .catch((reason) => {
-            if (reason.constructor.name === 'JsonRpcError') {
-              console.log(reason.message);
-              console.log(reason.data);
-            } else {
-              console.log(reason);
-            }
-          })
-            .then(() => {
-              users.login(userAdmin, passTest)
-                .then((logged) => {
-                  console.log(logged.token);
-                  dataTester.tokenAdmin = logged.token;
-                  done();
-                });
-            }); */
       });
     });
   });
@@ -158,7 +143,7 @@ describe('USER-AUTH-JSONRPC', () => {
   describe('/auth register', () => {
     it('it return 200 & missing parameter when email is undefined', () => {
       const jsonReq = buildRequest('register', {
-        password: passTest,
+        password: passNormal,
         profile: profileNormal
       });
       const options = {
@@ -169,12 +154,7 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'email'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'email');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -191,18 +171,14 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'password'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'password');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is undefined', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        password: passTest
+        password: passNormal
       });
       const options = {
         'headers': {'Content-Type': 'application/json'}
@@ -212,18 +188,14 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'profile'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'profile');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is an empty object', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        password: passTest,
+        password: passNormal,
         profile: {}
       });
       const options = {
@@ -234,18 +206,14 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'profile'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'profile');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is not an object', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        password: passTest,
+        password: passNormal,
         profile: 'hello world!'
       });
       const options = {
@@ -256,18 +224,14 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'profile'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'profile');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
     it('it return 200 on register', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        password: passTest,
+        password: passNormal,
         profile: profileNormal
       });
       const options = {
@@ -293,7 +257,7 @@ describe('USER-AUTH-JSONRPC', () => {
     it('it return 200 & duplicatedEntity for an already registered user', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
-        password: passTest,
+        password: passNormal,
         profile: profileNormal
       });
       const options = {
@@ -323,7 +287,7 @@ describe('USER-AUTH-JSONRPC', () => {
         'headers': {'Content-Type': 'application/json'},
         'auth': {
           'user': userNormal,
-          'pass': passTest
+          'pass': passNormal
         }
       };
       const response = chakram.post(`${url}/auth`, jsonReq, options);
@@ -447,7 +411,7 @@ describe('USER-AUTH-JSONRPC', () => {
         'headers': {'Content-Type': 'application/json'},
         'auth': {
           'user': userNormal,
-          'pass': passTest
+          'pass': passNormal
         }
       };
       const response = chakram.post(`${url}/auth`, jsonReq, options);
@@ -464,6 +428,92 @@ describe('USER-AUTH-JSONRPC', () => {
         dataTester.tokenLogin = response.valueOf().body.result.token;
         return Promise.resolve(resultToken);
       });
+    });
+  });
+
+  describe('/auth readProfile', () => {
+    it('should return 200 & success when user read its own profile', () => {
+      const jsonReq = buildRequest('readProfile', {
+        email: userNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.comprise
+        .json(jsonrpcLite.success(jsonReq.id,
+                                  {email: userNormal,
+                                   profile: profileNormal}));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('should return 200 & success when admin user read another user profile', () => {
+      const jsonReq = buildRequest('readProfile', {
+        email: userNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.comprise
+        .json(jsonrpcLite.success(jsonReq.id,
+                                  {email: userNormal,
+                                   profile: profileNormal}));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('should return 200 & error when email parameter is missing', () => {
+      const jsonReq = buildRequest('readProfile', {
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'email');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no bearer token is provided', () => {
+      const jsonReq = buildRequest('readProfile', {
+        email: userNormal,
+        profile: profileNormal
+      });
+      const options = {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expect(response)
+        .to.comprise
+        .json(jsonrpcLite.error(jsonReq.id,
+                                rpcErrors.invalidJWS({})));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
     });
   });
 
@@ -504,12 +554,7 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'email'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'email');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -528,12 +573,7 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'profile'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'profile');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -700,12 +740,7 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'email'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'email');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -724,12 +759,7 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                jsonrpcLite.JsonRpcError.invalidParams({
-                                  parameter: 'permission'
-                                })));
+      expectInvalidParam(jsonReq.id, response, 'permission');
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
