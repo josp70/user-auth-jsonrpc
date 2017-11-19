@@ -34,6 +34,18 @@ function expectInvalidParam(id, response, name) {
                             .JsonRpcError.invalidParams({parameter: name})));
 }
 
+function expectUnauthorized(id, response, data) {
+  expect(response)
+    .to.comprise
+    .json(jsonrpcLite.error(id, rpcErrors.unauthorized(data)));
+}
+
+function expectInvalidJWS(id, response, data = {}) {
+  expect(response)
+    .to.comprise
+    .json(jsonrpcLite.error(id, rpcErrors.invalidJWS(data)));
+}
+
 describe('USER-AUTH-JSONRPC', () => {
   const dataTester = {};
 
@@ -355,9 +367,8 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id, rpcErrors.unauthorized({})));
+      expectUnauthorized(jsonReq.id, response,
+                         {reason: 'Basic authorization required'});
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -398,10 +409,11 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                rpcErrors.unauthorized({email: userNormal})));
+      expectUnauthorized(jsonReq.id, response, {
+        email: userNormal,
+        reason: 'password does not match'
+      });
+      // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
 
@@ -593,12 +605,10 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                rpcErrors.unauthorized({
-                                  email: jsonReq.params.email,
-                                  sub: userNormal
-                                })));
+      expectUnauthorized(jsonReq.id, response, {
+        email: jsonReq.params.email,
+        sub: userNormal
+      });
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -779,11 +789,9 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
-      expect(response).to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                rpcErrors.unauthorized({
-                                  sub: userNormal
-                                })));
+      expectUnauthorized(jsonReq.id, response, {
+        sub: userNormal
+      });
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
@@ -835,8 +843,95 @@ describe('USER-AUTH-JSONRPC', () => {
     });
   });
 
-  describe('/auth makeAdmin', () => {
-    it('it return 200 & success when admin user try to modify a valid account', () => {
+  describe('/auth readPermission', () => {
+    it('should return 200 & success when admin read an user profile', () => {
+      const jsonReq = buildRequest('readPermission', {
+        email: userNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.comprise
+          .json(jsonrpcLite.success(jsonReq.id,
+                                    {email: userNormal,
+                                     permission: permissionTest}));
+
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('should return 200 & error when normal user try to read its own permission', () => {
+      const jsonReq = buildRequest('readPermission', {
+        email: userNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectUnauthorized(jsonReq.id, response, {
+        email: userNormal,
+        sub: userNormal
+      });
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('should return 200 & error when email parameter is missing', () => {
+      const jsonReq = buildRequest('readPermission', {
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'email');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no bearer token is provided', () => {
+      const jsonReq = buildRequest('readPermission', {
+        email: userNormal,
+        profile: profileNormal
+      });
+      const options = {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expect(response)
+        .to.comprise
+        .json(jsonrpcLite.error(jsonReq.id,
+                                rpcErrors.invalidJWS({})));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+  });
+
+  describe('/auth setAdmin', () => {
+    it('it return 200 & success when admin user setAdmin true', () => {
       const jsonReq = buildRequest('setAdmin', {
         email: userNormal,
         admin: true
@@ -854,6 +949,125 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & success when admin user setAdmin false', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal,
+        admin: false
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.comprise
+        .json(jsonrpcLite.success(jsonReq.id,
+                                  {email: userNormal}));
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when email parameter is missing', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        admin: true
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'email');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when admin parameter is missing', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'admin');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when admin parameter is not Boolean', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal,
+        admin: 'true'
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'admin');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no bearer token is provided', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal,
+        admin: false
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidJWS(jsonReq.id, response);
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no admin bearer token is provided', () => {
+      const jsonReq = buildRequest('setAdmin', {
+        email: userNormal,
+        admin: false
+      });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectUnauthorized(jsonReq.id, response, {sub: userNormal});
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
