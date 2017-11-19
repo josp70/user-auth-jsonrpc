@@ -198,3 +198,5 @@ jsonrpc.setAdmin = (req) => {
     value: admin
   }));
 };
+
+jsonrpc.getPublicKeyStore = () => jwks.get().toJSON();

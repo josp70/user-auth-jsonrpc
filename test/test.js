@@ -16,6 +16,7 @@ const jsonrpcLite = require('jsonrpc-lite');
 const service = require('./fixture/service');
 const rpcErrors = require('../errors/rpc-errors');
 const users = require('../model/users');
+const jose = require('node-jose');
 
 const HTTP200 = 200;
 const HTTP404 = 404;
@@ -1070,6 +1071,43 @@ describe('USER-AUTH-JSONRPC', () => {
       expectUnauthorized(jsonReq.id, response, {sub: userNormal});
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
+    });
+  });
+
+  describe('/auth getPublicKeyStore', () => {
+    it('it return 200 & success always', () => {
+      const jsonReq = buildRequest('getPublicKeyStore', {});
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+
+      /*
+      after(() => {
+        console.log(JSON.stringify(response.valueOf().body));
+      });*/
+
+      // now try to decode the tokenLogin
+      return chakram.wait()
+        .then((result) => jose.JWK.asKeyStore(response
+                                              .valueOf()
+                                              .body.result.keys)
+              .then((ks) => jose.JWS.createVerify(ks)
+                    .verify(dataTester.tokenLogin)
+                    .then((decoded) => {
+                      const payload = JSON.parse(decoded.payload.toString());
+
+                      expect(payload).to.deep.include({
+                        admin: false,
+                        sub: userNormal
+                      });
+                      return result;
+                    })));
     });
   });
 
