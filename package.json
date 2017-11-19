@@ -1,11 +1,11 @@
 {
   "name": "user-auth-jsonrpc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "package to support in the implementation of an user authentication end-point.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --timeout 5000",
-    "lint": "eslint errors http jsonrpc model test"
+    "lint": "eslint index.js errors http jsonrpc model test"
   },
   "repository": {
     "type": "git",

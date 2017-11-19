@@ -241,6 +241,15 @@ exports.updateProfile = (email, profile) =>
     }));
   });
 
+exports.readPermission = (email) =>
+  findUser(email, {
+    fields: {
+      _id: 0,
+      email: 1,
+      permission: 1
+    }
+  });
+
 exports.updatePermission = (email, permission) =>
   db.collection('users')
   .findOneAndUpdate({email}, {

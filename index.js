@@ -1,3 +1,5 @@
+/* eslint no-process-env: "off" */
+
 const mailer = require('mailer-template');
 const jsonrpc = require('jsonrpc2-express');
 const bearerToken = require('express-bearer-token');
@@ -48,8 +50,8 @@ function configRouter(router, options) {
 
 function configAdmin(options) {
   if (process.env.ADMIN_USER) {
-    if(process.env.ADMIN_USER === '' ||
-       (process.env.ADMIN_PASSWORD === undefined ||
+    if (process.env.ADMIN_USER === '' ||
+       (typeof process.env.ADMIN_PASSWORD === 'undefined' ||
         process.env.ADMIN_PASSWORD === '')) {
       return Promise.reject(new Error('Ivalid ADMIN_USER/ADMIN_PASSWORD'));
     }
