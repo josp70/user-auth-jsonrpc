@@ -171,9 +171,81 @@ describe('USER-AUTH-JSONRPC', () => {
       // after(() => {console.log(response.valueOf().body)});
       return chakram.wait();
     });
+    it('it return 200 & missing parameter when email is empty', () => {
+      const jsonReq = buildRequest('register', {
+        email: '',
+        password: passNormal,
+        profile: profileNormal
+      });
+      const options = {
+        'headers': {'Content-Type': 'application/json'}
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'email');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+    it('it return 200 & missing parameter when email is not a string', () => {
+      const jsonReq = buildRequest('register', {
+        email: {},
+        password: passNormal,
+        profile: profileNormal
+      });
+      const options = {
+        'headers': {'Content-Type': 'application/json'}
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'email');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
     it('it return 200 & missing parameter when password is undefined', () => {
       const jsonReq = buildRequest('register', {
         email: userNormal,
+        profile: profileNormal
+      });
+      const options = {
+        'headers': {'Content-Type': 'application/json'}
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'password');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+    it('it return 200 & missing parameter when password is empty', () => {
+      const jsonReq = buildRequest('register', {
+        email: userNormal,
+        password: '',
+        profile: profileNormal
+      });
+      const options = {
+        'headers': {'Content-Type': 'application/json'}
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectInvalidParam(jsonReq.id, response, 'password');
+      // after(() => {console.log(response.valueOf().body)});
+      return chakram.wait();
+    });
+    it('it return 200 & missing parameter when password is not a string', () => {
+      const jsonReq = buildRequest('register', {
+        email: userNormal,
+        password: {},
         profile: profileNormal
       });
       const options = {
