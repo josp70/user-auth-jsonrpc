@@ -26,6 +26,16 @@ function getParameter(req, name) {
   return value;
 }
 
+function checkNonEmptyString(value, name) {
+  if (typeof value !== 'string' || value === '') {
+    throw jsonrpcLite.JsonRpcError.invalidParams({
+      message: `parameter ${name} must be a non empty string`,
+      parameter: name,
+      value
+    });
+  }
+}
+
 function sendRegisterMail(req, infoUser) {
   const view = {
     href: url.format({
@@ -65,6 +75,9 @@ jsonrpc.register = (req) => {
   const email = getParameter(req, 'email');
   const password = getParameter(req, 'password');
   const profile = getParameter(req, 'profile');
+
+  checkNonEmptyString(email, 'email');
+  checkNonEmptyString(password, 'password');
 
   if (!isObject(profile)) {
     throw jsonrpcLite.JsonRpcError.invalidParams({
