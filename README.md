@@ -27,6 +27,12 @@ following:
 
   `npm install user-auth-jsonrpc`
 
+# Tests
+
+`npm run lint`
+
+`npm test`
+
 # Usage
 
 ```javascript
@@ -65,10 +71,6 @@ function start() {
 
 start();
 ```
-
-# Tests
-
-`npm test`
 
 # Email Configuration
 
