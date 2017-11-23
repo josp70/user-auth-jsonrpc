@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/jorge.suit/user-auth-jsonrpc.git"
+    "url": "https://gitlab.com/jorge.suit/user-auth-jsonrpc.git"
   },
   "keywords": [
     "user",
