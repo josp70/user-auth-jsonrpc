@@ -333,17 +333,19 @@ describe('USER-AUTH-JSONRPC', () => {
       const options = {
         'headers': {'Content-Type': 'application/json'}
       };
+
       const response = chakram.post(`${url}/auth`, jsonReq, options);
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaSuccess);
-      after(() => {
 
-        /* console.log('======================');
-           console.log(response.valueOf().body)
-           console.log('======================'); */
-      });
+      /* after(() => {
+
+        console.log('======================');
+        console.log(response.valueOf().body)
+        console.log('======================');
+      });*/
       return chakram.wait().then((result) => {
         dataTester.tokenRegister = response.valueOf().body.result.token;
         dataTester.mail = response.valueOf().body.result.mail;

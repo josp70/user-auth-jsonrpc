@@ -55,13 +55,17 @@ function sendRegisterMail(req, infoUser) {
     .then((infoSend) => {
       console.log('Message sent: %s', infoSend.messageId);
 
+      const result = {
+        email: infoUser.email
+      };
+
       /* eslint no-process-env: 0 */
       if (process.env.NODE_ENV === 'test') {
         // Preview only available when sending through an Ethereal account
         console.log('Preview URL: %s', mailer.getTestMessageUrl(infoSend));
-        infoUser.mail = {html: infoSend.message.html};
+        result.mail = {html: infoSend.message.html};
       }
-      return infoUser;
+      return result;
     });
 }
 
