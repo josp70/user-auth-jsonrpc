@@ -5,11 +5,7 @@ profile data for the user.
 
 ## Request
 
-The body must be a valid JSON-RPC request.
-
-### Parameters
-
-The method expect the following parameters:
+The body must be a valid JSON-RPC request, with the following parameters:
 
 * `email`: the user email, will be considered as the user identifier
 * `password`: the user password
