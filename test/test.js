@@ -8,10 +8,15 @@
 process.env.NODE_ENV = 'test';
 process.env.ADMIN_USER = 'admin-test@gmail.com';
 process.env.ADMIN_PASSWORD = 'admin';
+
 const cheerio = require('cheerio');
 const chakram = require('chakram');
 const {expect} = chakram;
 const uuidv1 = require('uuid/v1');
+const API_KEY = uuidv1();
+
+process.env.APP_USER_AUTH_API_KEY = API_KEY;
+
 const jsonrpcLite = require('jsonrpc-lite');
 const service = require('./fixture/service');
 const rpcErrors = require('../errors/rpc-errors');
@@ -45,6 +50,12 @@ function expectInvalidJWS(id, response, data = {}) {
   expect(response)
     .to.comprise
     .json(jsonrpcLite.error(id, rpcErrors.invalidJWS(data)));
+}
+
+function expectEntityNotFound(id, response, data = {}) {
+  expect(response)
+    .to.comprise
+    .json(jsonrpcLite.error(id, rpcErrors.entityNotFound(data)));
 }
 
 describe('USER-AUTH-JSONRPC', () => {
@@ -369,7 +380,10 @@ describe('USER-AUTH-JSONRPC', () => {
     it('it return 200 & accountNotActivated on login when account not activated', () => {
       const jsonReq = buildRequest('login');
       const options = {
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY
+        },
         'auth': {
           'user': userNormal,
           'pass': passNormal
@@ -446,7 +460,7 @@ describe('USER-AUTH-JSONRPC', () => {
       return chakram.wait();
     });
 
-    it('it return 200 & entityNotFound when wrong user', () => {
+    it('it return 200 & unauthorized when no X-API-KEY header', () => {
       const jsonReq = buildRequest('login');
       const badUser = 'user_not_found@gmail.com';
       const options = {
@@ -461,17 +475,66 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
-      expect(response)
-        .to.comprise
-        .json(jsonrpcLite.error(jsonReq.id,
-                                rpcErrors.entityNotFound({email: badUser})));
+      expectUnauthorized(jsonReq.id, response,
+        {reason: 'Expected X-API-KEY header'});
+
+      return chakram.wait();
+    });
+
+    it('it return 200 & unauthorized when X-API-KEY header does not match', () => {
+      const jsonReq = buildRequest('login');
+      const badUser = 'user_not_found@gmail.com';
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'X-API-KEY': `${API_KEY}xxx`
+        },
+        'auth': {
+          'user': badUser,
+          'pass': 'wrong_password'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectUnauthorized(jsonReq.id, response,
+        {reason: 'Invalid X-API-KEY header'});
+
+      return chakram.wait();
+    });
+
+    it('it return 200 & entityNotFound when wrong user', () => {
+      const jsonReq = buildRequest('login');
+      const badUser = 'user_not_found@gmail.com';
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY
+        },
+        'auth': {
+          'user': badUser,
+          'pass': 'wrong_password'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
+      expect(response).to.have.schema(schemaError);
+      expectEntityNotFound(jsonReq.id, response, {email: badUser});
+
       return chakram.wait();
     });
 
     it('it return 200 & unauthorized when wrong password', () => {
       const jsonReq = buildRequest('login');
       const options = {
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY
+        },
         'auth': {
           'user': userNormal,
           'pass': 'wrong_password'
@@ -493,7 +556,10 @@ describe('USER-AUTH-JSONRPC', () => {
     it('it return 200 & JWS token', () => {
       const jsonReq = buildRequest('login');
       const options = {
-        'headers': {'Content-Type': 'application/json'},
+        'headers': {
+          'Content-Type': 'application/json',
+          'X-API-KEY': API_KEY
+        },
         'auth': {
           'user': userNormal,
           'pass': passNormal

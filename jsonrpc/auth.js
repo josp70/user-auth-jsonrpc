@@ -5,6 +5,7 @@ const jsonrpcLite = require('jsonrpc-lite');
 const mailer = require('mailer-template');
 const url = require('url');
 const jwks = require('jwks-db');
+const apiKey = require('../model/api-key');
 
 const jsonrpc = {};
 
@@ -98,6 +99,7 @@ jsonrpc.login = (req) => {
       reason: 'Basic authorization required'
     }));
   }
+  apiKey.check(req);
 
   return users.login(user.name, user.pass);
 };

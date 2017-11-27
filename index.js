@@ -7,6 +7,7 @@ const jwks = require('jwks-db');
 const confirm = require('./http/confirm');
 const authRpc = require('./jsonrpc/auth');
 const users = require('./model/users');
+const apiKey = require('./model/api-key');
 
 function configDb(options) {
   if (!options.db) {
@@ -62,10 +63,18 @@ function configAdmin(options) {
   return Promise.resolve(options);
 }
 
+function configApiKey(options) {
+  const key = process.env.APP_USER_AUTH_API_KEY || '';
+
+  apiKey.setApiKey(key);
+  return Promise.resolve(options);
+}
+
 exports.mount = (router, options) => configRouter(router, options)
   .then(configDb)
   .then(configMail)
   .then(configJWKS)
-  .then(configAdmin);
+  .then(configAdmin)
+  .then(configApiKey);
 
 exports.errors = require('./errors/rpc-errors');
