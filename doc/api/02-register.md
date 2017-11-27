@@ -5,6 +5,8 @@ profile data for the user.
 
 ## Request
 
+**path: `POST /auth`**
+
 The body must be a valid JSON-RPC request, with the following parameters:
 
 * `email`: the user email, will be considered as the user identifier

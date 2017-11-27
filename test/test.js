@@ -24,6 +24,7 @@ const users = require('../model/users');
 const jose = require('node-jose');
 
 const HTTP200 = 200;
+const HTTP400 = 400;
 const HTTP404 = 404;
 
 function buildRequest(method, params) {
@@ -401,7 +402,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.accountNotActivated({
                                   email: userNormal})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -413,10 +416,11 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       after(() => {
-        // console.log(response.valueOf().body)
+        // console.log(response.valueOf().body);
       });
       return chakram.wait();
     });
+
     it('it return 404 when confirming a confirmed user', () => {
       const dom = cheerio.load(dataTester.mail.html);
       const href = dom('.activate').attr('href');
@@ -425,7 +429,17 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP404);
       after(() => {
-        // console.log(response.valueOf().body)
+        // console.log(response.valueOf().body);
+      });
+      return chakram.wait();
+    });
+
+    it('it return 400 when confirming with no query', () => {
+      const response = chakram.get(`${url}/auth/confirm/register`);
+
+      expect(response).to.have.status(HTTP400);
+      after(() => {
+        // console.log(response.valueOf().body);
       });
       return chakram.wait();
     });

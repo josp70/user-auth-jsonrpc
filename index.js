@@ -40,12 +40,11 @@ function configRouter(router, options) {
     throw Error('url path required in options.path, ej. "/auth');
   }
   router.use(bearerToken());
-  router.get(`${options.path}/confirm/register`, confirm.register);
-  router.get(`${options.path}/confirm/password`, confirm.password);
-
   jsonrpc(options.path, router, {
     methods: authRpc.jsonrpc
   });
+  router.get(`${options.path}/confirm/register`, confirm.register);
+  router.get(`${options.path}/confirm/password`, confirm.password);
   return Promise.resolve(options);
 }
 
