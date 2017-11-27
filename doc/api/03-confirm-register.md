@@ -45,7 +45,7 @@ body has the following json
 }
 ```
 
-* 404: if the user account does not exists or it is already activated 
+* 404: if the user account does not exist or it is already activated 
 ```json
 {
   "email": "user-test@gmail.com",
