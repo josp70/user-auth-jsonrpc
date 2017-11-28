@@ -27,6 +27,12 @@ following:
 
   `npm install user-auth-jsonrpc`
 
+# Tests
+
+`npm run lint`
+
+`npm test`
+
 # Usage
 
 ```javascript
@@ -65,10 +71,6 @@ function start() {
 
 start();
 ```
-
-# Tests
-
-`npm test`
 
 # Email Configuration
 
@@ -145,6 +147,9 @@ where,
 * `href` is the link to confirm the action (register or password change)
 
 # API
+
+You can see the documentation for the client API of the implemented end-point at
+[API doc](https://gitlab.com/jorge.suit/user-auth-jsonrpc/tree/master/doc/api)
 
 # Contributing
 

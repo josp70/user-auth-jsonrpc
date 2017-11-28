@@ -40,12 +40,11 @@ function configRouter(router, options) {
     throw Error('url path required in options.path, ej. "/auth');
   }
   router.use(bearerToken());
-  router.get(`${options.path}/confirm/register`, confirm.register);
-  router.get(`${options.path}/confirm/password`, confirm.password);
-
   jsonrpc(options.path, router, {
     methods: authRpc.jsonrpc
   });
+  router.get(`${options.path}/confirm/register`, confirm.register);
+  router.get(`${options.path}/confirm/password`, confirm.password);
   return Promise.resolve(options);
 }
 
@@ -54,7 +53,7 @@ function configAdmin(options) {
     if (process.env.ADMIN_USER === '' ||
        (typeof process.env.ADMIN_PASSWORD === 'undefined' ||
         process.env.ADMIN_PASSWORD === '')) {
-      return Promise.reject(new Error('Ivalid ADMIN_USER/ADMIN_PASSWORD'));
+      return Promise.reject(new Error('Invalid ADMIN_USER/ADMIN_PASSWORD'));
     }
     return users.createAdminAccount(process.env.ADMIN_USER,
                                   process.env.ADMIN_PASSWORD)
@@ -64,7 +63,7 @@ function configAdmin(options) {
 }
 
 function configApiKey(options) {
-  const key = process.env.APP_USER_AUTH_API_KEY || '';
+  const key = process.env.API_KEY || '';
 
   apiKey.setApiKey(key);
   return Promise.resolve(options);

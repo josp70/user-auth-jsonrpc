@@ -1,19 +1,23 @@
 const users = require('../model/users');
 const rpcErrors = require('../errors/rpc-errors');
 
-function getParameter(req, name) {
+function getParameter(req, name, res) {
   const value = req.query[name];
+  const http400 = 400;
 
   if (typeof value === 'undefined' || value === null) {
-    throw new Error(`query parameter ${name} is required`);
+    res.status(http400).json({
+      message: 'query parameter is required',
+      parameter: name
+    });
   }
   return value;
 }
 
 exports.register = (req, res) => {
   // Extract query parameter
-  const email = getParameter(req, 'email');
-  const token = getParameter(req, 'token');
+  const email = getParameter(req, 'email', res);
+  const token = getParameter(req, 'token', res);
 
   // Do register
   return users.confirmRegister(email, token)

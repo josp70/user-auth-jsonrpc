@@ -15,7 +15,7 @@ const {expect} = chakram;
 const uuidv1 = require('uuid/v1');
 const API_KEY = uuidv1();
 
-process.env.APP_USER_AUTH_API_KEY = API_KEY;
+process.env.API_KEY = API_KEY;
 
 const jsonrpcLite = require('jsonrpc-lite');
 const service = require('./fixture/service');
@@ -24,6 +24,7 @@ const users = require('../model/users');
 const jose = require('node-jose');
 
 const HTTP200 = 200;
+const HTTP400 = 400;
 const HTTP404 = 404;
 
 function buildRequest(method, params) {
@@ -179,7 +180,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when email is empty', () => {
@@ -197,7 +200,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when email is not a string', () => {
@@ -215,7 +220,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when password is undefined', () => {
@@ -232,7 +239,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'password');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when password is empty', () => {
@@ -250,7 +259,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'password');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when password is not a string', () => {
@@ -268,7 +279,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'password');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is undefined', () => {
@@ -285,7 +298,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'profile');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is an empty object', () => {
@@ -303,7 +318,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'profile');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 & missing parameter when profile is not an object', () => {
@@ -321,7 +338,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'profile');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
     it('it return 200 on register', () => {
@@ -333,16 +352,15 @@ describe('USER-AUTH-JSONRPC', () => {
       const options = {
         'headers': {'Content-Type': 'application/json'}
       };
+
       const response = chakram.post(`${url}/auth`, jsonReq, options);
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.header('content-type', 'application/json; charset=utf-8');
       expect(response).to.have.schema(schemaSuccess);
-      after(() => {
 
-        /* console.log('======================');
-           console.log(response.valueOf().body)
-           console.log('======================'); */
+      after(() => {
+        // console.log(response.valueOf().body);
       });
       return chakram.wait().then((result) => {
         dataTester.tokenRegister = response.valueOf().body.result.token;
@@ -370,7 +388,9 @@ describe('USER-AUTH-JSONRPC', () => {
                                 rpcErrors.entityDuplicated({
                                   email: userNormal
                                 })));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
@@ -399,7 +419,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.accountNotActivated({
                                   email: userNormal})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -411,10 +433,11 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       after(() => {
-        // console.log(response.valueOf().body)
+        // console.log(response.valueOf().body);
       });
       return chakram.wait();
     });
+
     it('it return 404 when confirming a confirmed user', () => {
       const dom = cheerio.load(dataTester.mail.html);
       const href = dom('.activate').attr('href');
@@ -423,7 +446,17 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP404);
       after(() => {
-        // console.log(response.valueOf().body)
+        // console.log(response.valueOf().body);
+      });
+      return chakram.wait();
+    });
+
+    it('it return 400 when confirming with no query', () => {
+      const response = chakram.get(`${url}/auth/confirm/register`);
+
+      expect(response).to.have.status(HTTP400);
+      after(() => {
+        // console.log(response.valueOf().body);
       });
       return chakram.wait();
     });
@@ -456,7 +489,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.schema(schemaError);
       expectUnauthorized(jsonReq.id, response,
                          {reason: 'Basic authorization required'});
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -549,7 +584,9 @@ describe('USER-AUTH-JSONRPC', () => {
         email: userNormal,
         reason: 'password does not match'
       });
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -574,7 +611,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait().then((resultToken) => {
         dataTester.tokenLogin = response.valueOf().body.result.token;
         return Promise.resolve(resultToken);
@@ -601,7 +640,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal,
                                    profile: profileNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -623,7 +664,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal,
                                    profile: profileNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -641,7 +684,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -663,7 +708,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .to.comprise
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.invalidJWS({})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
@@ -687,7 +734,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .to.comprise
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.invalidJWS({})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -706,7 +755,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -725,7 +776,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'profile');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -748,7 +801,9 @@ describe('USER-AUTH-JSONRPC', () => {
         email: jsonReq.params.email,
         sub: userNormal
       });
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -800,7 +855,9 @@ describe('USER-AUTH-JSONRPC', () => {
                                 rpcErrors.entityNotFound({
                                   email: jsonReq.params.email
                                 })));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -822,7 +879,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -847,7 +906,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
@@ -871,7 +932,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .to.comprise
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.invalidJWS({})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -890,7 +953,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -909,7 +974,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'permission');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -931,7 +998,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expectUnauthorized(jsonReq.id, response, {
         sub: userNormal
       });
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -955,7 +1024,9 @@ describe('USER-AUTH-JSONRPC', () => {
                                 rpcErrors.entityNotFound({
                                   email: jsonReq.params.email
                                 })));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -977,13 +1048,15 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
 
   describe('/auth readPermission', () => {
-    it('should return 200 & success when admin read an user profile', () => {
+    it('should return 200 & success when admin read an user permission', () => {
       const jsonReq = buildRequest('readPermission', {
         email: userNormal
       });
@@ -1002,7 +1075,9 @@ describe('USER-AUTH-JSONRPC', () => {
                                     {email: userNormal,
                                      permission: permissionTest}));
 
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1024,7 +1099,9 @@ describe('USER-AUTH-JSONRPC', () => {
         email: userNormal,
         sub: userNormal
       });
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1042,7 +1119,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1064,7 +1143,9 @@ describe('USER-AUTH-JSONRPC', () => {
         .to.comprise
         .json(jsonrpcLite.error(jsonReq.id,
                                 rpcErrors.invalidJWS({})));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
@@ -1088,7 +1169,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1110,7 +1193,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.comprise
         .json(jsonrpcLite.success(jsonReq.id,
                                   {email: userNormal}));
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1129,7 +1214,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'email');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1148,7 +1235,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'admin');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1168,7 +1257,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidParam(jsonReq.id, response, 'admin');
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1187,7 +1278,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectInvalidJWS(jsonReq.id, response);
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
 
@@ -1207,7 +1300,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaError);
       expectUnauthorized(jsonReq.id, response, {sub: userNormal});
-      // after(() => {console.log(response.valueOf().body)});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
       return chakram.wait();
     });
   });
@@ -1225,10 +1320,9 @@ describe('USER-AUTH-JSONRPC', () => {
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaSuccess);
 
-      /*
       after(() => {
-        console.log(JSON.stringify(response.valueOf().body));
-      });*/
+        // console.log(JSON.stringify(response.valueOf().body));
+      });
 
       // now try to decode the tokenLogin
       return chakram.wait()
