@@ -7,6 +7,8 @@ profile data for the user.
 
 **path: `POST /auth`**
 
+**method: `register`**
+
 The body must be a valid JSON-RPC request, with the following parameters:
 
 * `email`: the user email, will be considered as the user identifier
@@ -36,13 +38,7 @@ The body must be a valid JSON-RPC request, with the following parameters:
 
 ## Response
 
-In case of success an email is sent to the user with a confirmation url and a 'SUCCESS' JSON-RPC is returned. The result contains the email of the user registered.
-
-### Success
-
-The result field of the success response
-
-#### Example
+In case of success an email is sent to the user with a confirmation url and a JSON-RPC result is returned. The result contains the email of the user registered.
 
 ```json
 {
@@ -58,50 +54,50 @@ The result field of the success response
 
 The following error responses can be generated:
 
-#### Invalid params
-
+* **if a parameter is missing**
 ```json
-{
-  "jsonrpc": "2.0",
-  "id": "79b35250-d2dd-11e7-bf97-e5a10b620ed7",
-  "error": {
-    "message": "Invalid params",
-    "code": -32602,
-    "data": {
-      "message": "missing parameter",
-      "parameter": "email"
+    {
+      "jsonrpc": "2.0",
+      "id": "79b35250-d2dd-11e7-bf97-e5a10b620ed7",
+      "error": {
+        "message": "Invalid params",
+        "code": -32602,
+        "data": {
+          "message": "missing parameter",
+          "parameter": "email"
+        }
+      }
     }
-  }
-}
 ```
 
+* **if a parameter has an invalid value**
 ```json
-{
-  "jsonrpc": "2.0",
-  "id": "17443c50-d2de-11e7-88b3-5f372623f503",
-  "error": {
-    "message": "Invalid params",
-    "code": -32602,
-    "data": {
-      "message": "parameter profile must be a non empty object",
-      "parameter": "profile"
+    {
+      "jsonrpc": "2.0",
+      "id": "17443c50-d2de-11e7-88b3-5f372623f503",
+      "error": {
+        "message": "Invalid params",
+        "code": -32602,
+        "data": {
+          "message": "parameter profile must be a non empty object",
+          "parameter": "profile"
+        }
+      }
     }
-  }
-}
 ```
 
-#### Entity duplicated
+* **if the user is already registered**
 ```json
-{
-  "jsonrpc": "2.0",
-  "id": "1802d160-d2de-11e7-88b3-5f372623f503",
-  "error": {
-    "message": "Entity duplicated",
-    "code": -33002,
-    "data": {
-      "email": "user-test@gmail.com",
-      "reason": "user already registered"
+    {
+      "jsonrpc": "2.0",
+      "id": "1802d160-d2de-11e7-88b3-5f372623f503",
+      "error": {
+        "message": "Entity duplicated",
+        "code": -33002,
+        "data": {
+          "email": "user-test@gmail.com",
+          "reason": "user already registered"
+        }
+      }
     }
-  }
-}
 ```

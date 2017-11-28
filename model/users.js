@@ -164,8 +164,11 @@ function findUser(email, options) {
 exports.login = (email, password) => db.collection('users')
   .findOne({email}, {
     fields: {
-      permission: 0,
-      profile: 0
+      _id: 0,
+      admin: 1,
+      hash: 1,
+      permission: 1,
+      tokenRegister: 1
     }
   })
   .then((doc) => {
