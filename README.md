@@ -148,8 +148,8 @@ where,
 
 # API
 
-You can see the documentation for the client API of the implemented end-point at
-[API doc](https://gitlab.com/jorge.suit/user-auth-jsonrpc/tree/master/doc/api)
+You can see the documentation of the client API for the implemented end-point at
+[API doc](https://gitlab.com/jorge.suit/user-auth-jsonrpc/wikis/home#client-api)
 
 # Contributing
 
