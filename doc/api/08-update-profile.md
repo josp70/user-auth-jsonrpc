@@ -116,6 +116,7 @@ The following error responses can be generated:
     }
 ```
 * **if user not found**
+ 
 ```json
     {
       "error": {
