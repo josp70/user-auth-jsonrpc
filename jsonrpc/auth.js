@@ -168,10 +168,10 @@ jsonrpc.readPermission = (req) => {
 
   return extractJWT(req.token)
     .then((decoded) => {
-      if (!decoded.payload.admin) {
+      if (decoded.payload.sub !== email && !decoded.payload.admin) {
         return Promise.reject(rpcErrors.unauthorized({
           email,
-          reason: 'only admin users are allowed to read permission',
+          reason: 'not allowed to read user permission',
           sub: decoded.payload.sub
         }));
       }

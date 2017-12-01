@@ -33,6 +33,18 @@ function buildRequest(method, params) {
   return jsonrpcLite.request(id, method, params);
 }
 
+function expectResultObject(id, response, result) {
+  expect(response).to.comprise.json(jsonrpcLite.success(id, result));
+}
+
+function expectResultFields(id, response, fields) {
+  fields.forEach((field) => {
+    expect(response).to.have.json(`result.${field}`, () => {
+      // do nothing
+    });
+  });
+}
+
 function expectInvalidParam(id, response, name) {
   expect(response)
     .to.comprise
@@ -1070,18 +1082,17 @@ describe('USER-AUTH-JSONRPC', () => {
 
       expect(response).to.have.status(HTTP200);
       expect(response).to.have.schema(schemaSuccess);
-      expect(response).to.comprise
-          .json(jsonrpcLite.success(jsonReq.id,
-                                    {email: userNormal,
-                                     permission: permissionTest}));
-
+      expectResultObject(jsonReq.id, response, {
+        email: userNormal,
+        permission: permissionTest
+      });
       after(() => {
         // console.log(response.valueOf().body);
       });
       return chakram.wait();
     });
 
-    it('should return 200 & error when normal user try to read its own permission', () => {
+    it('should return 200 & success when normal user reads its own permission', () => {
       const jsonReq = buildRequest('readPermission', {
         email: userNormal
       });
@@ -1094,11 +1105,11 @@ describe('USER-AUTH-JSONRPC', () => {
       const response = chakram.post(`${url}/auth`, jsonReq, options);
 
       expect(response).to.have.status(HTTP200);
-      expect(response).to.have.schema(schemaError);
-      expectUnauthorized(jsonReq.id, response, {
-        email: userNormal,
-        sub: userNormal
-      });
+      expect(response).to.have.schema(schemaSuccess);
+      expectResultFields(jsonReq.id, response, [
+        'email',
+        'permission'
+      ]);
       after(() => {
         // console.log(response.valueOf().body);
       });
