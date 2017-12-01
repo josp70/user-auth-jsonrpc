@@ -1,7 +1,7 @@
 # API: read profile
 
-The method `readProfile` returns the profile object for the given user account.
-It can only be invoked using a valid bearer token.
+The method `readProfile` returns the profile object for the given user
+account.  It can only be invoked using a valid bearer token.
 
 ## Request
 
@@ -9,13 +9,14 @@ It can only be invoked using a valid bearer token.
 
 **method: `readProfile`**
 
-The body must be a valid JSON-RPC request with the following parameters:
+The body must be a valid JSON-RPC request with the following
+parameters:
 
 * `email`: the email identifying the user account.
 
-The method requires a bearer token in the `Authorization` header of the
-http request.  The sub claim of the token should match the user email or
-has admin rights (`admin==true`).
+The method requires a bearer token in the `Authorization` header of
+the http request.  The sub claim of the token should match the user
+email or has admin rights (`admin==true`).
 
 ### Example
 
@@ -45,18 +46,18 @@ in case of success or error in other case.
 ### Success
 
 The result field of the response contains the email of the user account
-and an object profile for that user. 
+and an object profile for that user.
 
 ```json
     {
-        "id": 0, 
-        "jsonrpc": "2.0", 
+        "id": 0,
+        "jsonrpc": "2.0",
         "result": {
-            "email": "user-test@gmail.com", 
+            "email": "user-test@gmail.com",
             "profile": {
-                "company": "Sus labores", 
-                "name": "Paco", 
-                "otherField": "otro campo", 
+                "company": "Sus labores",
+                "name": "Paco",
+                "otherField": "otro campo",
                 "surname": "Perico"
             }
         }

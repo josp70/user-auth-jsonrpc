@@ -1,8 +1,8 @@
 # API: readPermission
 
 The method `readPermission` returns the `permission` field/claim for
-the given user account. It can only be invoked using a valid bearer token
-with admin rights.
+the given user account. It can only be invoked using a valid bearer
+token.
 
 ## Request
 
@@ -14,8 +14,9 @@ The body must be a valid JSON-RPC request with the following parameter:
 
 * `email`: the email identifying the user account.
 
-The method requires a bearer token in the `Authorization` header of the
-http request and the token must has admin rights.
+The method requires a bearer token in the `Authorization` header of
+the http request.  The sub claim of the token should match the user
+email or has admin rights (`admin==true`).
 
 ### Example
 
@@ -44,8 +45,8 @@ in case of success or error in other case.
 
 ### Success
 
-The result field of the response contains the email and the permission field of the
-user account, for example:
+The result field of the response contains the email and the permission
+field of the user account, for example:
 
 ```json
 {
@@ -100,7 +101,7 @@ The following error responses can be generated:
     }
 ```
 
-* **if bearer token without admin rights is provided**
+* **if bearer token is not admin or does not match the user account**
 
 ```json
     {
@@ -110,8 +111,8 @@ The following error responses can be generated:
         "message": "Unauthorized",
         "code": -33005,
         "data": {
-          "reason": "not allowed to read user profile",
-          "sub": "user-test@gmail.com"
+          "reason": "not allowed to read user permission",
+          "sub": "user-other@gmail.com"
         }
       }
     }
