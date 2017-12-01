@@ -114,9 +114,7 @@ describe('USER-AUTH-JSONRPC', () => {
               'string'
             ]
           },
-          'result': {
-            'type': 'object'
-          }
+          'result': {}
         },
         'required': [
           'id',
@@ -1300,6 +1298,66 @@ describe('USER-AUTH-JSONRPC', () => {
         email: userNormal,
         admin: false
       });
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenLogin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectUnauthorized(jsonReq.id, response, {sub: userNormal});
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
+      return chakram.wait();
+    });
+  });
+
+  describe('/auth listUsers', () => {
+    it('it return 200 & success when invoked on behave of admin', () => {
+      const jsonReq = buildRequest('listUsers', {});
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${dataTester.tokenAdmin}`
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaSuccess);
+      expect(response).to.have.json('result', (result) => {
+        expect(result).to.be.an('array');
+      });
+      after(() => {
+        // console.log(JSON.stringify(response.valueOf().body, null, '  '));
+      });
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no bearer token is provided', () => {
+      const jsonReq = buildRequest('listUsers', {});
+      const options = {
+        'headers': {
+          'Content-Type': 'application/json'
+        }
+      };
+      const response = chakram.post(`${url}/auth`, jsonReq, options);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema(schemaError);
+      expectInvalidJWS(jsonReq.id, response);
+      after(() => {
+        // console.log(response.valueOf().body);
+      });
+      return chakram.wait();
+    });
+
+    it('it return 200 & error when no admin bearer token is provided', () => {
+      const jsonReq = buildRequest('listUsers', {});
       const options = {
         'headers': {
           'Content-Type': 'application/json',
