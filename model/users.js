@@ -273,3 +273,11 @@ exports.updatePermission = (email, permission) =>
       reason: 'user not found'
     }));
   });
+
+exports.listUsers = () => db.collection('users').find({})
+  .project({
+    _id: 0,
+    email: 1,
+    profile: 1
+  })
+  .toArray();

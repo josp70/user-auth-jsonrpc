@@ -218,4 +218,15 @@ jsonrpc.setAdmin = (req) => {
   }));
 };
 
+jsonrpc.listUsers = (req) => extractJWT(req.token)
+      .then((decoded) => {
+        if (!decoded.payload.admin) {
+          return Promise.reject(rpcErrors.unauthorized({
+            reason: 'only admin users are allowed to list users',
+            sub: decoded.payload.sub
+          }));
+        }
+        return users.listUsers();
+      });
+
 jsonrpc.getPublicKeyStore = () => jwks.get().toJSON();
