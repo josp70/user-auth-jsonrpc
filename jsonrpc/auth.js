@@ -41,7 +41,7 @@ function sendRegisterMail(req, infoUser) {
   const view = {
     href: url.format({
       host: req.get('host'),
-      pathname: `${req.path}/confirm/register`,
+      pathname: `${req.get('x-real-location') || req.path}/confirm/register`,
       protocol: req.protocol,
       query: {
         email: infoUser.email,
