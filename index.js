@@ -5,6 +5,7 @@ const jsonrpc = require('jsonrpc2-express');
 const bearerToken = require('express-bearer-token');
 const jwks = require('jwks-db');
 const confirm = require('./http/confirm');
+const getJWKS = require('./http/get-jwks');
 const authRpc = require('./jsonrpc/auth');
 const users = require('./model/users');
 const apiKey = require('./model/api-key');
@@ -34,7 +35,6 @@ function configJWKS(options) {
   return jwks.connect(options.db).then(() => options);
 }
 
-
 function configRouter(router, options) {
   if (!options.path) {
     throw Error('url path required in options.path, ej. "/auth');
@@ -43,6 +43,7 @@ function configRouter(router, options) {
   jsonrpc(options.path, router, {
     methods: authRpc.jsonrpc
   });
+  router.get(`${options.path}/.well-known/jwks.json`, getJWKS.endpoint);
   router.get(`${options.path}/confirm/register`, confirm.register);
   router.get(`${options.path}/confirm/password`, confirm.password);
   return Promise.resolve(options);

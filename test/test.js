@@ -1377,7 +1377,7 @@ describe('USER-AUTH-JSONRPC', () => {
   });
 
   describe('/auth getPublicKeyStore', () => {
-    it('it return 200 & success always', () => {
+    it('it return 200 & success always on POST', () => {
       const jsonReq = buildRequest('getPublicKeyStore', {});
       const options = {
         'headers': {
@@ -1398,6 +1398,45 @@ describe('USER-AUTH-JSONRPC', () => {
         .then((result) => jose.JWK.asKeyStore(response
                                               .valueOf()
                                               .body.result.keys)
+              .then((ks) => jose.JWS.createVerify(ks)
+                    .verify(dataTester.tokenLogin)
+                    .then((decoded) => {
+                      const payload = JSON.parse(decoded.payload.toString());
+
+                      expect(payload).to.deep.include({
+                        admin: false,
+                        sub: userNormal
+                      });
+                      return result;
+                    })));
+    });
+
+    it('it return 200 & on GET /auth/.well-known/jwks.json', () => {
+
+      const response = chakram.get(`${url}/auth/.well-known/jwks.json`);
+
+      expect(response).to.have.status(HTTP200);
+      expect(response).to.have.schema({
+        'type': 'object',
+        'properties': {
+          'keys': {
+            'type': 'array',
+            'items': {'type': 'object'}
+          }
+        },
+        'required': ['keys'],
+        'additionalProperties': false
+      });
+
+      after(() => {
+        // console.log(JSON.stringify(response.valueOf()));
+      });
+
+      // now try to decode the tokenLogin
+      return chakram.wait()
+        .then((result) => jose.JWK.asKeyStore(response
+                                              .valueOf()
+                                              .body.keys)
               .then((ks) => jose.JWS.createVerify(ks)
                     .verify(dataTester.tokenLogin)
                     .then((decoded) => {
