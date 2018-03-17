@@ -127,7 +127,7 @@ With the following templates contents:
 
 ### Template View
 
-Each template is renderd
+Each template is rendered
 using [mustache](https://www.npmjs.com/package/mustache) and the view
 object which can be expanded in the templates has the following
 structure:
