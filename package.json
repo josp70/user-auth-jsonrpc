@@ -4,7 +4,7 @@
   "description": "package to support in the implementation of an user authentication end-point.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha --timeout 6000",
+    "test": "nyc mocha --timeout 10000",
     "lint": "eslint index.js errors http jsonrpc model test"
   },
   "repository": {
