@@ -11,23 +11,15 @@ services:
 variables:
   MONGO_URI: 'mongodb://mongo/user_auth'
 
-stages:
-  - install
-  - test
-
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
     - node_modules/
 
-install:
-  stage: install
+install_test:
   script:
     - npm install
-
-test:
-  stage: test
-  script:
     - npm run lint
     - npm test
+
