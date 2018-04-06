@@ -58,5 +58,5 @@ typings/
 .env
 
 .tern-port
-package-lock.json
+# package-lock.json
 *~
