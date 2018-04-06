@@ -4,7 +4,7 @@
   "description": "package to support in the implementation of an user authentication end-point.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha --timeout 10000",
+    "test": "nyc mocha --timeout 15000",
     "lint": "eslint index.js errors http jsonrpc model test"
   },
   "repository": {
@@ -26,17 +26,17 @@
   "dependencies": {
     "basic-auth": "^2.0.0",
     "bcrypt": "^1.0.3",
-    "express-bearer-token": "^2.1.0",
-    "jsonrpc2-express": "^0.3.2",
-    "jwks-db": "0.0.1",
-    "mailer-template": "0.0.1"
+    "express-bearer-token": "^2.1.1",
+    "jsonrpc2-express": "^0.4.3",
+    "jwks-db": "0.0.3",
+    "mailer-template": "1.0.0"
   },
   "devDependencies": {
     "chakram": "^1.5.0",
     "cheerio": "^1.0.0-rc.2",
-    "eslint": "^4.13.1",
-    "mocha": "^4.0.1",
-    "mongodb-connection-cache": "0.0.1",
-    "nyc": "^11.3.0"
+    "eslint": "^4.19.1",
+    "mocha": "^5.0.5",
+    "mongodb-connection-cache": "0.1.1",
+    "nyc": "^11.6.0"
   }
 }
