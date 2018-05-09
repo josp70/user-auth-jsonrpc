@@ -25,7 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "basic-auth": "^2.0.0",
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^2.0.1",
     "express-bearer-token": "^2.1.1",
     "jsonrpc2-express": "^0.4.3",
     "jwks-db": "0.0.3",
