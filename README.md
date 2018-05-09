@@ -2,16 +2,16 @@ user-auth-jsonrpc
 =========
 ![build status](https://gitlab.com/jorge.suit/user-auth-jsonrpc/badges/master/build.svg)
 
-This is a node package to support in the implementation of an user
+This is a node package to support in the implementation of a user
 authentication end-point.
 
 The implementation of user-auth-jsonrpc is based on the following main
 packages:
 
 * express: to implement the http server
-* mongodb: to persit the user information
+* mongodb: to persiet the user information
 * node-jose: to generate the authorization tokens
-* nodemailer: to send confirmation mails to the user
+* nodemailer: to send confirmation emails to the user
 
 In order to use this package your code/environment should meet the
 following:
